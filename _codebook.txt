@@ -1,0 +1,621 @@
+%% Codebook
+
+
+% Everything contained in this folder is necessary for reproducing the
+% analyses of the "Ergodicity-breaking" experiment.
+% The codebookhas been structured loosely according to suggestions by the
+% Princeton library
+% https://dss.princeton.edu/online_help/analysis/codebook.htm
+
+
+%% Description of the Study
+% For details on the authors and the study, please refer to the published
+% manuscript
+
+
+%% Sampling information
+% Participants were recruited from the general population via online
+% advertisement. For details please refer to the published manuscript.
+
+
+%% Technical Information about the Files
+%
+% For more details, see sections "Details about the Data" below
+%
+% We acquired data from 20 subjects, we provide data data from 19 subjects. 
+% One subject was excluded due to falling asleep, the data from this 
+% subject are not provided. Another subject (subject 5) was excluded upon 
+% data inspection because the participant  obviously misunderstood the 
+% experiment, choosing the disadvantegous gamble with a higher probability 
+% and choosing incorrectly in non-brainer trials (see manuscript) more than
+% 50% of trials. This subject's data are provided, take care to exclude 
+% this subject from analysis as is done in the analysis scripts.
+%
+% .txt files:
+% The original data files are four .txt files per subject, for the passive
+% learning session and the active session from the additive and
+% multiplicative day. 
+% The filenames contain a subject ID (1-19) and a suffix denoting the
+% session (1 = passive, 2 = active). Since the passive session is only 
+% relevant for the neuroimaging data analysis (no choice data) and not part
+% of the results in the manuscript, we only provide data from the active 
+% sessions. These are placed in the folders "TxtFiles_additive" for the 
+% additive day and "TxtFiles_multiplicative" for the multiplicative day. 
+%
+% allData.mat file:
+% These .txt files are read in with the python script "readingData.py"
+% which computes new variables and saves all the information from all
+% subjects into one file "allData.mat"
+%
+% allData_synth_...mat files:
+% These files contain a subset of the variables contained in allData.mat 
+% and choices made by synthetic agents instead of the real participants.
+%
+% data_betasForParamRecov.mat file:
+% contains the beta values used for the softmax function for all synthetic 
+% agents. 
+%
+% data_ergChoice_AllData.csv file:
+% A csv file containing the variables used for Bayesian t-tests, ANOVAS and
+% correlation analyses with JASP
+%
+% data_ergChoice_AllData.csv contains a number of variables used for 
+% JASP analyses
+% 
+% data_ergChoiceProportions.mat contains information about proportion of 
+% choices in accordance with logarithmic utility during discrepant trials 
+%
+% data_etaBeta2Time.mat contains information about the time average growth over 
+% the gambles presented to subject 1 with the combination of different eta
+% and different beta values 
+% 
+% data_etasForParamRecov.mat contains the randomly drawn eta values for 
+% parameter recovery
+%
+% data_euclidDistancesEta.mat contains information about the distance of 
+% each subjects fitted etas from the additive and multiplicative session to
+% the coordinates predicted by time-optimal and a time-invariant utility
+% model
+%
+% data_mapBetas.mat contains maximum a posteriori estimates of the beta 
+% parameter values for each subject and session
+%
+% data_mapEtas.mat contains maximum a posteriori estimates of the eta parameter 
+% values for each subject and session 
+%
+% data_proportionCorrectNoBrainers.txt is a comma-separated text file
+% containing information about the proportion of correct choices for no-
+% brainer trials 
+%
+% data_TimeAveragesChosenGambles.txt is a comma-separated text file 
+% containing the time average additive and time average multiplicative 
+% growth rate for every subject
+%
+
+
+%% Structure of the Data within the File
+% The .txt files contain trial-wise (rows) information about different
+% variables (columns), information is tab-separated.
+%
+% The "allData.mat" file contains all relevant variables, with 19 entries
+% per variable (most variables are cells, such that the 19 entries each
+% contain multiple data entries, e.g. as many as there were trials for that
+% subject). It is this data file that all analyses are based upon.
+
+
+%% Details about the Data - .txt files
+% Data from subject 5 should not be analysed (see section "Technical 
+% Information about the Files" above)
+% 
+% The .txt files contain the following variables (columns):
+%
+% subjID: Subject ID (same value in all rows)
+%
+% session: Number of session (passive learning = 1, active decision = 2) 
+% (same value in all rows)
+%
+% Block: Number of block (updates after the break (see description of 
+% experiment in manuscript))
+%
+% trialCount: Counter of each event/trial
+%
+% earnings: Monetary endowment at the beginning of trial. In the active
+% session, this value is the same for all rows as the outcome of the
+% gambles was not realised.
+%
+% Gam1Onset: Time point when first gamble is presented (in seconds)
+%
+% Gam2Onset: Time point when second gamble is presented (in seconds)
+%
+% FBOnset: Time point when subject can choose between gambles (in seconds)
+%
+% KPs: Key-press while subject can choose. 9 = left button press. 8 = right
+% button press. If the subject pressed multiple times, these multiple 
+% button presses are listed, separated by comma
+%
+% RT: Time points (in seconds) of key-press responses while subject can 
+% choose (FBOnset needs to be subtracted in order to obtain RT)
+%
+% KPlate: Key-press after decision period per trial is over
+% 
+% RTlate: Time point of late key-press – NOT CORRECTLY RECORDED – it is 
+% always 1s after decision period per trial is over, thus not the true RT
+%
+% KP_Final: Final key-press amongst the key presse made during the response
+% period (i.e. this is the final entry from variable "KPs)
+%
+% SLOnset: Time point when selection is highlighted
+%
+% Gam1_1: Change in wealth associated with reward-cue 1 of gamble 1. On the
+% additive day, the value of this variable describes the additive change in
+% wealth DKK. On the multiplicative day, the value of this variable
+% describes the multiplicative change in wealth in DKK*100. For example, a 
+% value of 183.02 describes a multiplication of current wealth with 1.8302
+%
+% Gam1_2: Same as above for reward-cue 2 of gamble 1
+%
+% Gam2_1: Same as above for reward-cue 1 of gamble 2
+%
+% Gam2_2: Same as above for reward-cue 2 of gamble 2
+%
+% Jit1: There is a 1.5-3 s random (uniform) delay between the onset of the 
+% first gamble and the onset of the second gamble. For a given trial, this
+% delay is 1 + this variable value
+%
+% Jit2: Same as for Jit1, but for delay between second gamble and response 
+% period
+%
+% Jit3: 2-4 s random (uniform) inter-trial-interval between trials,
+% corresponding to the value of this variable
+
+%% Details about the Data - allData.mat file
+% For details about how these variables were computed, see "readingData.py"
+% Most variables are 1 x 19 cell arrays, each cell containing the data for 
+% one of the 19 subjects. 
+% Data from subject 5 should not be analysed (see section "Technical 
+% Information about the Files" above)
+%
+% A number of variables relate to linear and logarithmic utility. For all
+% of them, the following applies:
+%
+% Linear utility means the additive change in wealth. In the additive
+% session, this is equal to the change in wealth that a given fractal will
+% always induce, e.g. +428 DKK. In the multiplicative session, this is
+% change will vary depending on the initial wealth. For example, for a
+% fractal inducing a multiplication of the current wealth with 1.4962, the
+% absolute change in wealth with an initial wealth of 1000 DKK would be
+% (1000*1.4962)-1000.
+% 
+% Logarithmic utility is the logarithm of the multiplicative change in
+% wealth. For the multiplicative session, this is equal to the log of the
+% multiplicative change in wealth that fractal always induces, e.g. a
+% multiplication of the initial wealth with 1.4962. For the additive
+% session, this change will vary depending on the initial wealth. For
+% example, for a fractal inducing an additive change of +428, the
+% multiplicative change in wealth with an initial wealth of 1000 DKK would
+% be log((1000+428)/1000).
+% 
+% The variables in the allData.mat file are:
+%
+% BestChoice_Left1Right0_delta_EU_Lin_add: For each choice in the additive 
+% session, according to linear utility, does the left gamble (1) or the 
+% right gamble (0) have the highest value?
+%
+% BestChoice_Left1Right0_delta_EU_Lin_multi: For each choice in the 
+% multiplicative  session, according to linear utility, does the left 
+% gamble (1) or the right gamble (0) have the highest value?
+%
+% BestChoice_Left1Right0_delta_EU_Log_add: For each choice in the additive 
+% session, according to logarithmic utility, does the left gamble (1) or  
+% the right gamble (0) have the highest value?
+%
+% BestChoice_Left1Right0_delta_EU_Log_multi: For each choice in the 
+% multiplicative  session, according to logarithmic utility, does the left 
+% gamble (1) or the right gamble (0) have the highest value?
+%
+% BestChosen_delta_EU_Lin_add: For each choice in the additive session, did
+% the subject choose the option with the highest value in linear utility?
+%
+% BestChosen_delta_EU_Lin_multi: For each choice in the multiplicative 
+% session, did the subject choose the option with the highest value in 
+% linear utility?
+%
+% BestChosen_delta_EU_Log_add: For each choice in the additive session, did
+% the subject choose the option with the highest value in logarithmic 
+% utility?
+%
+% BestChosen_delta_EU_Log_multi: For each choice in the multiplicative 
+% session, did the subject choose the option with the highest value in 
+% logarithmic utility?
+%
+% Choice_add: For each trial in the additive session, did the subject 
+% choose the left (1) or right (0) gamble?
+%
+% Choice_multi: For each trial in the multiplicative session, did the 
+% subject choose the left (1) or right (0) gamble?
+%
+% DecGambs_choice_TA_add: For each discrepant trial in the additive 
+% session,(see manuscript for definition), did the subject choose in 
+% accordance with logarithmic utility (1) (time-average, TA) or in 
+% accordance with linear utility (0)
+%
+% DecGambs_choice_TA_multi: For each discrepant trial in the multiplicative 
+% session(see manuscript for definition), did the subject choose in 
+% accordance with logarithmic utility (1) (time-average, TA) or in 
+% accordance with linear utility (0)
+%
+% Decisive_gambles_add: Contains two columns for each discrepant trial in
+% the additive session. First column is difference in linear utility left
+% minus right gamble, second column is difference in logarithmic utility
+% left minus right gamble.
+%
+% Decisive_gambles_index_add: For each trial in the additive
+% session, is the trial a discrepant trial (1) or not (0).
+%
+% Decisive_gambles_index_multi: For each trial in the multiplicative
+% session, is the trial a discrepant trial (1) or not (0).
+%
+% Decisive_gambles_multi: Contains two columns for each discrepant trial in
+% the multiplicative session. First column is difference in linear utility 
+% left minus right gamble, second column is difference in logarithmic 
+% utility left minus right gamble.
+%
+% EU_Lin_Gam1_add: For each trial in the additive session, linear utility 
+% of gamble 1 (left side gamble)
+%
+% EU_Lin_Gam1_multi: For each trial in the multiplicative session, linear 
+% utility of gamble 1 (left side gamble)
+%
+% EU_Lin_Gam2_add: For each trial in the additive session, linear utility 
+% of gamble 2 (right side gamble)
+%
+% EU_Lin_Gam2_multi: For each trial in the multiplicative session, linear 
+% utility of gamble 2 (right side gamble)
+%
+% EU_Lin_LeftBetter_add: For each trial in the additive session, does the
+% left gamble have a higher linear utility than the right gamble (1) or
+% does the right gamble have a higher linear utility (0)
+%
+% EU_Lin_LeftBetter_multi: For each trial in the multiplicative session, 
+% does the left gamble have a higher linear utility than the right gamble 
+% (1) or does the right gamble have a higher linear utility (0)
+%
+% EU_Log_Gam1_add: For each trial in the additive session, logarithmic 
+% utility of gamble 1 (left side gamble)
+%
+% EU_Log_Gam1_multi: For each trial in the multiplicative session, 
+% logarithmic utility of gamble 1 (left side gamble)
+%
+% EU_Log_Gam2_add: For each trial in the additive session, logarithmic 
+% utility of gamble 2 (right side gamble)
+%
+% EU_Log_Gam2_multi:  For each trial in the multiplicative session, 
+% logarithmic utility of gamble 2 (right side gamble)
+%
+% EU_Log_LeftBetter_add: For each trial in the additive session, does the
+% left gamble have a higher logarithmic utility than the right gamble (1) 
+% or does the right gamble have a higher linear utility (0)
+%
+% EU_Log_LeftBetter_multi: For each trial in the multiplicative session, 
+% does the left gamble have a higher logarithmic utility than the right 
+% gamble (1) or does the right gamble have a higher linear utility (0)
+%
+% FBOnset_add: For each trial in the additive session, time point when
+% response period starts (in seconds)
+%
+% FBOnset_multi: For each trial in the multiplicative session, time point
+% when response period starts (in seconds)
+%
+% Gam1_1_add: For each trial in the additive session, additive change in 
+% wealth of top left fractal
+%
+% Gam1_1_multi: For each trial in the multiplicative session, 
+% multiplicative change in wealth of top left fractal
+%
+% Gam1_2_add: For each trial in the additive session, additive change in 
+% wealth of bottom left fractal
+%
+% Gam1_2_multi: For each trial in the multiplicative session, 
+% multiplicative change in wealth of bottom left fractal
+%
+% Gam2_1_add: For each trial in the additive session, additive change in 
+% wealth of top right fractal
+%
+% Gam2_1_multi: For each trial in the multiplicative session, 
+% multiplicative change in wealth of top right fractal
+%
+% Gam2_2_add: For each trial in the additive session, additive change in 
+% wealth of bottom right fractal
+%
+% Gam2_2_multi: For each trial in the multiplicative session, 
+% multiplicative change in wealth of bottom right fractal
+%
+% KP_Final_add: For each trial in the additive session, the last keypress.
+% This includes responses made after the response period had finished.
+%
+% KP_Final_multi: For each trial in the multiplicative session, the last 
+% keypress. This includes responses made after the response period had
+% finished.
+%
+% KP_Late_add: For each trial in the additive session, keypresses after
+% response period had finished. NaN if not late keypress for that trial.
+%
+% KP_Late_multi: For each trial in the multiplicative session, keypresses 
+% after response period had finished. NaN if not late keypress for that trial.
+%
+% LinU_Gam1_1_add: For each trial in the additive session, linear utility
+% of top left fractal
+%
+% LinU_Gam1_1_multi: For each trial in the multiplicative session, linear 
+% utility of top left fractal
+%
+% LinU_Gam1_2_add: For each trial in the additive session, linear utility
+% of bottom left fractal
+%
+% LinU_Gam1_2_multi: For each trial in the multiplicative session, linear 
+% utility of bottom left fractal
+%
+% LinU_Gam2_1_add: For each trial in the additive session, linear utility
+% of top right fractal
+%
+% LinU_Gam2_1_multi: For each trial in the multiplicative session, linear 
+% utility of top right fractal
+%
+% LinU_Gam2_2_add: For each trial in the additive session, linear utility
+% of bottom right fractal
+%
+% LinU_Gam2_2_multi: For each trial in the multiplicative session, linear 
+% utility of bottom right fractal
+%
+% LogU_Gam1_1_add: For each trial in the additive session, logarithmic 
+% utility of top left fractal
+%
+% LogU_Gam1_1_multi: For each trial in the multiplicative session,
+% logarithmic utility of top left fractal
+%
+% LogU_Gam1_2_add: For each trial in the additive session, logarithmic 
+% utility of bottom left fractal
+%
+% LogU_Gam1_2_multi: For each trial in the multiplicative session,
+% logarithmic utility of bottom left fractal
+%
+% LogU_Gam2_1_add: For each trial in the additive session, logarithmic 
+% utility of top right fractal
+%
+% LogU_Gam2_1_multi: For each trial in the multiplicative session,
+% logarithmic utility of top right fractal
+%
+% LogU_Gam2_2_add: For each trial in the additive session, logarithmic 
+% utility of bottom right fractal
+%
+% LogU_Gam2_2_multi: For each trial in the multiplicative session,
+% logarithmic utility of bottom right fractal
+%
+% MultiplicativeSessionFirst: One value per subject, 1 if multiplicative
+% day was the first test day, 0 if additive day was first test day
+%
+% NoBrainerChoiceCorrect_add: For each "no-brainer" trial in the additive 
+% session (both gambles share one identical fractal, thus, the choice is 
+% only which of the two other fractals is the better one), did the subject 
+% make the correct choice (1) or not (0).
+%
+% NoBrainerChoiceCorrect_multi: For each "no-brainer" trial in the 
+% multiplicative session (both gambles share one identical fractal, thus, 
+% the choice is only which of the two other fractals is the better one), 
+% did the subject make the correct choice (1) or not (0).
+%
+% NoBrainerChoices_add: For each "no-brainer" trial in the additive 
+% session, did the subject choose the left gamble (1) or the right (0)
+%
+% NoBrainerChoices_multi: For each "no-brainer" trial in the multiplicative 
+% session, did the subject choose the left gamble (1) or the right (0)
+%
+% NoBrainerGambles_add: Four columns, one row for each "no-brainer" trial 
+% in the additive session. From left to right, columns contain additive 
+% change in wealth for top-left, bottom-left, top-right and bottom-right
+% gamble
+%
+% NoBrainerGambles_multi: Four columns, one row for each "no-brainer" trial 
+% in the multiplicative session. From left to right, columns contain  
+% multiplicative change in wealth for top-left, bottom-left, top-right and 
+% bottom-right gamble
+%
+% NoBrainerValueDifference_add: For each "no-brainer" trial in the additive 
+% session, difference in additive change in wealth between the 
+% non-identical fractals, left minus right unique factor
+%
+% NoBrainerValueDifference_multi: For each "no-brainer" trial in the  
+% multiplicative session, difference in multiplicative change in wealth 
+% between the non-identical fractals, left minus right unique factor
+%
+% RT_firstPress_add: For each trial in the additive session, reaction time
+% of the first key press.
+%
+% RT_firstPress_multi: For each trial in the multiplicative session, 
+% reaction time of the first key press.
+%
+% RT_lastPress_add: For each trial in the additive session, reaction time
+% of the last key press (including responses made after end of response
+% period)
+%
+% RT_lastPress_multi: For each trial in the multiplicative session, 
+% reaction time of the last key press (including responses made after end 
+% of response period)
+%
+% RT_stringFormat_add: For each trial in the additive session, times for 
+% all responses within response period.
+%
+% RT_stringFormat_multi: For each trial in the multiplicative session, 
+% times for all responses within response period.
+%
+% RTlate_stringFormat_add: For each trial in the additive session, times 
+% for all responses after response period.
+%
+% RTlate_stringFormat_multi: For each trial in the multiplicative session, 
+% times for all responses after response period.
+%
+% Wealth_add: One value per subject, wealth taken from additive passive
+% session to additive active session.
+%
+% Wealth_multi: One value per subject, wealth taken from multiplicative 
+% passive session to multiplicative active session.
+%
+% delta_EU_Lin_add: For each trial in the additive session, difference in
+% linear utility between the two gambles (left minus right)
+%
+% delta_EU_Lin_multi: For each trial in the multiplicative session, 
+% difference in linear utility between the two gambles (left minus right)
+%
+% delta_EU_Log_add: For each trial in the additive session, difference in
+% logarithmic utility between the two gambles (left minus right)
+%
+% delta_EU_Log_multi: For each trial in the multiplicative session, 
+% difference in logarithmic utility between the two gambles (left minus 
+% right)
+
+
+%% Details about the Data - allData_synth_modelRecov.mat and
+% allData_synth_paramRecov_etaXX-XX_beta500 files
+%
+% The data files for the model and parameter recovery only contain the 
+% subset of variables relevant for the Hierarchical Latent Mixture 
+% Modelling. These are:
+% LinU_Gam1_1_add, LinU_Gam1_2_add, LinU_Gam2_1_add, LinU_Gam2_2_add,
+% LinU_Gam1_1_multi, LinU_Gam1_2_multi, LinU_Gam2_1_multi, LinU_Gam2_2_multi,
+% LogU_Gam1_1_add, LogU_Gam1_2_add, LogU_Gam2_1_add, LogU_Gam2_2_add,
+% LogU_Gam1_1_multi, LogU_Gam1_2_multi, LogU_Gam2_1_multi, LogU_Gam2_2_multi,
+% delta_EU_Lin_add, delta_EU_Log_add, delta_EU_Lin_multi, delta_EU_Log_multi,
+% NoBrainerChoiceCorrect_add, NoBrainerChoiceCorrect_multi, 
+% Wealth_add, Wealth_multi, Choice_add, Choice_multi
+%
+% For the model recovery, each variable contains 27 cells for the 27 
+% synthetic agents, all 27 entries being a replication of the gambles 
+% presented to participant 1. Only the choices are changed to the choices 
+% made by the synthetic agents instead. For details, see also comments 
+% in "computeSyntheticData4ModelRecovery.m"
+%
+% For the parameter recovery, each variable contains the 19 cells as in the
+% original data file. Only the choices are changed to the choices made by
+% the synthetic agents making decisions based on the isoelastic utility 
+% function with different combinations of eta values for the additive and 
+% multiplicative session, based on the gambles presented to the 19 
+% subjects. The first two digits in the file name describe the eta used to 
+% calculate isoelastic utility in the additive session and the next two 
+% digits for the multiplicative session: 
+% -5 = eta of -0.5, 00 = eta of 0, 05 = eta of 0.5, 10 = eta of 1.0
+% For details, see also comments in "computeSyntheticData4ParameterRecovery.m"
+
+
+%% Details about the Data - data_betasForParamRecov.mat 
+%
+% contains the beta values used for the softmax function for all synthetic 
+% agents. Here fixed to 500, but if 
+% "computeSyntheticData4ParameterRecovery.m" is run with variable betas,
+% this file will contain different beta values (see comments in that 
+% script)
+
+
+%% Details about the Data - data_ergChoice_AllData.csv
+%
+% A csv file with rows (subject) x columns (variables) for JASP Bayesian 
+% statistical testing (t-test, ANOVA, correlation)
+% 
+% *First: Dummy variable coding whether participant was tested in 
+% multiplicative session first (1) or additive session first (0)
+%
+% Age
+% 
+% Gender
+%
+% proChooseLogDisc+: Proportion of discrepant trials (logarithmic utility
+% and linear utility do not assign highest value to same gamble) that were 
+% chosen in accordance with logartithmic utility in the additive session.
+%
+% proChooseLogDisc*: Proportion of discrepant trials (logarithmic utility
+% and linear utility do not assign highest value to same gamble) that were 
+% chosen in accordance with logartithmic utility in the multiplicative
+% session.
+%
+% etaShiftTowardOpt+: eta in multiplicative minus eta in additive session
+%
+% eta+: fitted eta value for additive session
+%
+% eta*: fitted eta value for multiplicative session
+%
+% distfromopt+: absolute distance of eta+ from 0
+%
+% distfromopt*: absolute distance of eta* from 1
+%
+% euclidDistTime: euclidian distance of [eta+,eta*] coordinate from time-
+% optimal coordinate [0,1]
+%
+% eucldDistIso: euclidian distance of [eta+,eta*] coordinate closest point
+% on diagonal (same x and y coordinate)
+%
+% deltaEuclidDistIso-Time: eucldDistIso minus euclidDistTime
+
+
+%% Details about the Data - data_ergChoiceProportions.mat 
+%
+% contains a table with two variables:
+%
+% propChooseLogDisc: corresponding to proChooseLogDisc+ in
+% data_ergChoice_AllData.csv (see above)
+% 
+% propChooseLogDisc1: corresponding to proChooseLogDisc* in 
+% data_ergChoice_AllData.csv (see above)
+
+
+%% Details about the Data - data_etaBeta2Time.mat
+%
+% contains two variables: 
+% 
+% TimeAvAdd: 100 x 100 matrix with the time average additive growth over 
+% the gambles presented to subject 1 with the combination of 100 different
+% eta and 100 different beta values (see computeHLM.m for details)
+%
+% TimeAvMult: Same as above, for time average multiplicative growth
+
+
+%% Details about the Data - data_etasForParamRecov.mat
+%
+% contains the eta values that were randomly drawn from a normal 
+% distribution around a given value in a 25 (combination of 5 eta and 5
+% different beta values) x 19 (subjects) x 2 (session) matrix (see 
+% computeSyntheticData4ParameterRecovery.m for details)
+
+
+%% Details about the Data - data_euclidDistancesEta.mat
+%
+% contains a table with two variables:
+%
+% euclidDistTime: as in data_ergChoice_AllData.csv (see above)
+%
+% eucldDistIso: as in data_ergChoice_AllData.csv(see above)
+
+
+%% Details about the Data - data_mapBetas.mat
+%
+% contains 19 x 2 maximum a posteriori estimates of the beta parameter 
+% values for each subject (rows) for the additive (first column) and the 
+% multiplicative session (second column)
+
+
+%% Details about the Data - data_mapEtas.mat
+%
+% contains 19 x 2 maximum a posteriori estimates of the eta parameter 
+% values for each subject (rows) for the additive (first column) and the 
+% multiplicative session (second column)
+
+
+%% Details about the Data - data_proportionCorrectNoBrainers.txt
+%
+% a comma-separated text file containing for every subject (rows) the 
+% proportion of correct choices for no-brainer trials in the additive 
+% session, the multiplicative session and the average (in this order)
+
+
+%% Details about the Data - data_TimeAveragesChosenGambles.txt
+%
+% a comma-separated text file containing the time average additive and time
+% average multiplicative growth rate (in this order) for every subject (row)
