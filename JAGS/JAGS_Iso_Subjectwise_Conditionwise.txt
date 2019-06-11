@@ -1,0 +1,74 @@
+# Fit condition specific params for isoelastic model for each subject
+
+model{
+
+##LIKELIHOOD
+  
+for (i in 1:nSubjects){  
+
+    for (c in 1:nConditions){
+
+        oneminEta[i,c]      = 1 - eta[i,c] #1 minus eta term
+        uwealth[c,i]        = ( pow(wealths[c,i],oneminEta[i,c]) -1 ) / oneminEta[i,c] 
+       
+        for (t in 1:nTrials){
+        
+        w1[i,c,t]           = wealths[c,i]+dx1[i,c,t] #computes wealth after the outcome
+        w2[i,c,t]           = wealths[c,i]+dx2[i,c,t]
+        w3[i,c,t]           = wealths[c,i]+dx3[i,c,t]
+        w4[i,c,t]           = wealths[c,i]+dx4[i,c,t]     
+        u1[i,c,t]           = ( pow(w1[i,c,t]     ,oneminEta[i,c]) -1 ) / oneminEta[i,c] 
+        u2[i,c,t]           = ( pow(w2[i,c,t]     ,oneminEta[i,c]) -1 ) / oneminEta[i,c] 
+        u3[i,c,t]           = ( pow(w3[i,c,t]     ,oneminEta[i,c]) -1 ) / oneminEta[i,c] 
+        u4[i,c,t]           = ( pow(w4[i,c,t]     ,oneminEta[i,c]) -1 ) / oneminEta[i,c] 
+        du1[i,c,t]          =  u1[i,c,t]-uwealth[c,i]
+        du2[i,c,t]          =  u2[i,c,t]-uwealth[c,i]
+        du3[i,c,t]          =  u3[i,c,t]-uwealth[c,i]
+        du4[i,c,t]          =  u4[i,c,t]-uwealth[c,i]
+        edug1[i,c,t]        = (du1[i,c,t]+du2[i,c,t])/2   #expected change in utiluty for gamble 1
+        edug2[i,c,t]        = (du3[i,c,t]+du4[i,c,t])/2  
+        deuiso[i,c,t]       = edug1[i,c,t] - edug2[i,c,t] #difference in expected change in utility (between gambles)
+        sdeuiso[i,c,t]      = -1 * beta_iso[i,c] * deuiso[i,c,t] #scaled by sensitivity parameter  
+        tmpiso[i,c,t]       = (1)/(1+(exp(sdeuiso[i,c,t])))  # choice probability
+        theta[i,c,t]        = max(0.000001,min(0.999999,tmpiso[i,c,t])) # ensure 0 < cp < 1
+        y[i,c,t]            ~ dbern(theta[i,c,t]) 
+        
+        }# end of trials 
+
+    }# end of conditions
+
+}# end of subjects
+
+
+## PRIORS
+for (i in 1:nSubjects){			
+        
+        for (c in 1:nConditions){   
+ 
+        #iso
+        log_beta_iso[i,c]~ dnorm(mu_log_beta_iso[c], tau_log_beta_iso[c])  # log beta_lin sampled from normal hyperprior
+        beta_iso[i,c]    = exp(log_beta_iso[i,c])                          # transforms from logspace, now lognormally distributed prior
+        eta[i,c]         ~ dnorm(mu_eta[c],tau_eta[c])                     # eta 
+
+        }#end of conditions
+   
+}#end of subjects
+
+
+##HYPERPRIORS
+
+for (c in 1:nConditions){
+
+        #beta parameter        
+        mu_log_beta_iso[c]       ~ dunif(muLogBetaL,muLogBetaU)         #mean of log beta
+        tau_log_beta_iso[c]      = pow(sigma_log_beta_iso[c],-2)        #precision on log beta
+        sigma_log_beta_iso[c]    ~ dunif(sigmaLogBetaL,sigmaLogBetaU)   #std on log beta     
+
+        #eta parameter                           
+        mu_eta[c]                ~ dunif(muEtaL,muEtaU)                 #mean of eta
+        tau_eta[c]               = pow(sigma_eta[c],-2)                 #precision of eta
+        sigma_eta[c]             ~ dunif(sigmaEtaL,sigmaEtaU)           #std on eta    
+
+}#end of conditions
+
+}

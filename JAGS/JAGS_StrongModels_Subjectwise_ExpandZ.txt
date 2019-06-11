@@ -1,0 +1,210 @@
+# Which is best model for each subject out of the following strong models:
+#
+# Time (tw) where the mean eta is fixed by EE theory st linear=add and mult=log 
+# Prospect Theory (pt) where utility is free to vary over individuals according to PT
+# Isoelastic (iso) where utility is free to vary over individuals according to the isoelastic model 
+#
+# Note that the model indicator variable z, is parameter expanded to take on 12 different values rather than 3. This
+# allows better convergence. It allows four different values of the indicator variable to map to each utility
+# model, such that a z of 1,4,7,10 maps to the time model, 2,5,8,11 map to PT, and 3,5,9,12 map to iso.
+
+model{
+
+##LIKELIHOOD
+  
+  for (i in 1:nSubjects){  
+        
+        oneminEtaIso[i]  = 1 - eta_iso[i] #1 minus eta term, varies subjectwise not conditionwise
+
+    for (c in 1:nConditions){
+
+        #Condition and subjectwise variables
+        uwealthIso[c,i]    = ( pow(wealths[c,i],oneminEtaIso[i]) -1 ) / oneminEtaIso[i] #utility of wealth, varies conditionwise due to wealth dependence
+        oneminEtaTw[i,c]   = 1 - eta_tw[i,c] #1 minus eta term, varies by condition  
+        uwealthTw[c,i]     = ( pow(wealths[c,i],oneminEtaTw[i,c]) -1 ) / oneminEtaTw[i,c] #utility of wealth, varies conditionwise due to wealth dependence
+
+        for (t in 1:nTrials){
+        
+        #Update wealths
+        w1[i,c,t]          = wealths[c,i]+dx1[i,c,t] #computes wealth after the outcome
+        w2[i,c,t]          = wealths[c,i]+dx2[i,c,t] #ditto
+        w3[i,c,t]          = wealths[c,i]+dx3[i,c,t]
+        w4[i,c,t]          = wealths[c,i]+dx4[i,c,t] 
+        
+        #Time weak    
+        u1tw[i,c,t]        = ( pow(w1[i,c,t]     ,oneminEtaTw[i,c]) -1 ) / oneminEtaTw[i,c] #utility of wealth after outcome1
+        u2tw[i,c,t]        = ( pow(w2[i,c,t]     ,oneminEtaTw[i,c]) -1 ) / oneminEtaTw[i,c] #ditto 2
+        u3tw[i,c,t]        = ( pow(w3[i,c,t]     ,oneminEtaTw[i,c]) -1 ) / oneminEtaTw[i,c] 
+        u4tw[i,c,t]        = ( pow(w4[i,c,t]     ,oneminEtaTw[i,c]) -1 ) / oneminEtaTw[i,c] 
+        du1tw[i,c,t]       =  u1tw[i,c,t]-uwealthTw[c,i] #change in utility outcome 1
+        du2tw[i,c,t]       =  u2tw[i,c,t]-uwealthTw[c,i] #ditto 2
+        du3tw[i,c,t]       =  u3tw[i,c,t]-uwealthTw[c,i]
+        du4tw[i,c,t]       =  u4tw[i,c,t]-uwealthTw[c,i]
+        edug1tw[i,c,t]     =  (du1tw[i,c,t]+du2tw[i,c,t])/2 #expected change in utiluty for gamble 1
+        edug2tw[i,c,t]     =  (du3tw[i,c,t]+du4tw[i,c,t])/2  
+        deutw[i,c,t]       =  edug1tw[i,c,t] - edug2tw[i,c,t] #difference in expected change in utility (between gambles)
+        sdeutw[i,c,t]      = -1 * beta_tw[i,c] * deutw[i,c,t] #scaled by sensitivity parameter  
+        tmptw[i,c,t]       = (1)/(1+(exp(sdeutw[i,c,t]))) # choice probability
+        theta[i,c,t,1]     = max(0.000001,min(0.999999,tmptw[i,c,t])) # ensure 0 < cp < 1
+        theta[i,c,t,4]     = max(0.000001,min(0.999999,tmptw[i,c,t])) # ensure 0 < cp < 1
+        theta[i,c,t,7]     = max(0.000001,min(0.999999,tmptw[i,c,t])) # ensure 0 < cp < 1
+        theta[i,c,t,10]    = max(0.000001,min(0.999999,tmptw[i,c,t])) # ensure 0 < cp < 1, accomodates parameter expansion for z
+
+        #pt 
+        lamb1[i,c,t]       = ifelse(dx1[i,c,t]>0, 1, -1 * lambda[i]) #set lambda to 1 for positive outcomes, otherwise it is the negative value that is set by lambda
+        lamb2[i,c,t]       = ifelse(dx2[i,c,t]>0, 1, -1 * lambda[i])
+        lamb3[i,c,t]       = ifelse(dx3[i,c,t]>0, 1, -1 * lambda[i])
+        lamb4[i,c,t]       = ifelse(dx4[i,c,t]>0, 1, -1 * lambda[i])
+        alph1[i,c,t]       = ifelse(dx1[i,c,t]>0, alphaGain[i], alphaLoss[i]) #set lambda to 1 for positive outcomes, otherwise it is the negative value that is set by lambda
+        alph2[i,c,t]       = ifelse(dx2[i,c,t]>0, alphaGain[i], alphaLoss[i])
+        alph3[i,c,t]       = ifelse(dx3[i,c,t]>0, alphaGain[i], alphaLoss[i])
+        alph4[i,c,t]       = ifelse(dx4[i,c,t]>0, alphaGain[i], alphaLoss[i])
+        eadx1[i,c,t]       = pow(adx1[i,c,t],alph1[i,c,t]) #exponentiate absolute value of outcome by alpha       
+        eadx2[i,c,t]       = pow(adx2[i,c,t],alph2[i,c,t])
+        eadx3[i,c,t]       = pow(adx3[i,c,t],alph3[i,c,t])
+        eadx4[i,c,t]       = pow(adx4[i,c,t],alph4[i,c,t])
+        pu1[i,c,t]         = lamb1[i,c,t] *  eadx1[i,c,t] #multiply by lambda variable, lamb is negative for neg outcomes, and positive for pos outcomes
+        pu2[i,c,t]         = lamb2[i,c,t] *  eadx2[i,c,t]
+        pu3[i,c,t]         = lamb3[i,c,t] *  eadx3[i,c,t]
+        pu4[i,c,t]         = lamb4[i,c,t] *  eadx4[i,c,t]
+        epug1[i,c,t]       = (pu1[i,c,t]+pu2[i,c,t])/2  #calculate mean utility for gamble
+        epug2[i,c,t]       = (pu3[i,c,t]+pu4[i,c,t])/2           
+        deupt[i,c,t]       = epug1[i,c,t]-epug2[i,c,t] #difference in expected util        
+        sdeupt[i,c,t]      = -1 * beta_pt[i,c] * deupt[i,c,t] # sensitivity-scaled difference in eu
+        tmppt[i,c,t]       = (1)/(1+(exp(sdeupt[i,c,t]))) # choice probability
+        theta[i,c,t,2]     = max(0.000001,min(0.999999,tmppt[i,c,t])) # ensure 0 < cp < 1
+        theta[i,c,t,5]     = max(0.000001,min(0.999999,tmppt[i,c,t])) # ensure 0 < cp < 1, accomodates parameter expansion for z
+        theta[i,c,t,8]     = max(0.000001,min(0.999999,tmppt[i,c,t])) # ensure 0 < cp < 1, accomodates parameter expansion for z
+        theta[i,c,t,11]    = max(0.000001,min(0.999999,tmppt[i,c,t])) # ensure 0 < cp < 1, accomodates parameter expansion for z
+
+        #iso     
+        u1iso[i,c,t]       = ( pow(w1[i,c,t]     ,oneminEtaIso[i]) -1 ) / oneminEtaIso[i] 
+        u2iso[i,c,t]       = ( pow(w2[i,c,t]     ,oneminEtaIso[i]) -1 ) / oneminEtaIso[i] 
+        u3iso[i,c,t]       = ( pow(w3[i,c,t]     ,oneminEtaIso[i]) -1 ) / oneminEtaIso[i] 
+        u4iso[i,c,t]       = ( pow(w4[i,c,t]     ,oneminEtaIso[i]) -1 ) / oneminEtaIso[i] 
+        du1iso[i,c,t]      =  u1iso[i,c,t]-uwealthIso[c,i]
+        du2iso[i,c,t]      =  u2iso[i,c,t]-uwealthIso[c,i]
+        du3iso[i,c,t]      =  u3iso[i,c,t]-uwealthIso[c,i]
+        du4iso[i,c,t]      =  u4iso[i,c,t]-uwealthIso[c,i]
+        edug1iso[i,c,t]    =  (du1iso[i,c,t]+du2iso[i,c,t])/2  #expected change in utiluty for gamble 1
+        edug2iso[i,c,t]    =  (du3iso[i,c,t]+du4iso[i,c,t])/2  
+        deuiso[i,c,t]      =  edug1iso[i,c,t] - edug2iso[i,c,t] #difference in expected change in utility (between gambles)
+        sdeuiso[i,c,t]     = -1 * beta_iso[i,c] * deuiso[i,c,t] #scaled by sensitivity parameter  
+        tmpiso[i,c,t]      = (1)/(1+(exp(sdeuiso[i,c,t])))  # choice probability
+        theta[i,c,t,3]     = max(0.000001,min(0.999999,tmpiso[i,c,t])) # ensure 0 < cp < 1
+        theta[i,c,t,6]     = max(0.000001,min(0.999999,tmpiso[i,c,t])) # ensure 0 < cp < 1, accomodates parameter expansion for z
+        theta[i,c,t,9]     = max(0.000001,min(0.999999,tmpiso[i,c,t])) # ensure 0 < cp < 1, accomodates parameter expansion for z
+        theta[i,c,t,12]    = max(0.000001,min(0.999999,tmpiso[i,c,t])) # ensure 0 < cp < 1, accomodates parameter expansion for z
+
+        # Choice
+        y[i,c,t]           ~ dbern(theta[i,c,t,z[i]]) 
+
+        }# end of trials 
+     }# end of conditions
+  }# end of subjects
+
+##PRIORS
+
+#indicator variables 
+#the model indicator variable z can take on any value from 1:n, and is subject to two stochastic processes, to prevent getting stuck
+#the n values map onto just 3 models, and is simply a means of obtaining parameter expansion for the model indication
+for (i in 1:nSubjects){    
+px_z1[i]    ~ dcat(pz[])                                 #parameter expansion variable for z, takes on integers 1:n with equal probability
+px_z2[i]    ~ dcat(pz[])                                 #parameter expansion variable for z, takes on integers 1:n with equal probability
+delta_z1[i] = px_z2[i]-1                                 #parameter expansion variable for z, takes on integers 0:n-1 with equal probability
+sum_z[i]    = px_z1[i]+delta_z1[i]                       #sum takes on integers 1:2*n -1 with equal probability
+z[i]        = (sum_z[i] - (12 * trunc(sum_z[i]/12))) + 1 #modulo n, adding 1 to return to values 1 to 12 
+}       
+
+#submodels
+for (i in 1:nSubjects){			
+        
+        for (c in 1:nConditions){   
+        
+        #Time weak
+        beta_tw[i,c]        = exp(log_beta_tw[i,c])                          # lognormally distributed priors
+        log_beta_tw[i,c]    ~ dnorm(mu_log_beta_tw[c], tau_log_beta_tw[c])   # log beta_tw sampled from normal hyperprior
+        eta_tw[i,c]         ~ dnorm(mu_eta_tw[c],tau_eta_tw)                 # mean is fixed by the theory, but precision free to vary
+
+        #pt weak
+        beta_pt[i,c]        = exp(log_beta_pt[i,c])                          # transforms from logspace, now lognormally distributed prior
+        log_beta_pt[i,c]    ~ dnorm(mu_log_beta_pt[c], tau_log_beta_pt[c])   # log beta_lin sampled from normal hyperprior
+
+        #iso weak
+        beta_iso[i,c]       = exp(log_beta_iso[i,c])                         # lognormally distributed prior on beta
+        log_beta_iso[i,c]   ~ dnorm(mu_log_beta_iso[c], tau_log_beta_iso[c]) # log beta_lin sampled from normal hyperprior
+
+        }#end of conditions
+       
+    eta_iso[i]          ~ dnorm(mu_eta_iso,tau_eta_iso)               #eta is normally  distributed according to mu and tau
+    alphaGain[i]        = exp(log_alphaGain[i])                       #alphaGain for 1st session sampled from log-normal dist.
+    log_alphaGain[i]    ~ dnorm(mu_log_alphaGain, tau_log_alphaGain)  #log alphaGain sampled from normal dist.
+    
+    alphaLoss[i]        = exp(log_alphaLoss[i])                       #alphaLoss for 1st session sampled from log-normal dist.
+    log_alphaLoss[i]    ~ dnorm(mu_log_alphaLoss, tau_log_alphaLoss)    #log alphaLoss sampled from normal dist.
+
+    lambda[i]       = exp(log_lambda[i])                    #lambda sampled from log normal dist, times -1
+    log_lambda[i]   ~ dnorm(mu_log_lambda, tau_log_lambda)  #log lambda sampled from a normal dist. 
+
+}#end of subjects
+
+
+##HYPERPRIORS
+
+for (c in 1:nConditions){
+
+#tw 
+mu_log_beta_tw[c]       ~ dunif(muLogBetaL,muLogBetaU)
+tau_log_beta_tw[c]      = pow(sigma_log_beta_tw[c],-2)   
+sigma_log_beta_tw[c]    ~ dunif(sigmaLogBetaL,sigmaLogBetaU)        
+mu_eta_tw[c]            = selectEtaTw[c] #sets mean of hyperprior to 0 for add and 1 for mult  
+
+#pt
+mu_log_beta_pt[c]      ~ dunif(muLogBetaL,muLogBetaU)  
+tau_log_beta_pt[c]     = pow(sigma_log_beta_pt[c],-2)
+sigma_log_beta_pt[c]   ~ dunif(sigmaLogBetaL,sigmaLogBetaU)         
+
+#iso 
+mu_log_beta_iso[c]     ~ dunif(muLogBetaL,muLogBetaU)                #prior on mean of dist. of log beta
+tau_log_beta_iso[c]    = pow(sigma_log_beta_iso[c],-2)               #prior on precision of dist. of log beta
+sigma_log_beta_iso[c]  ~ dunif(sigmaLogBetaL,sigmaLogBetaU)          #prior on std of dist. of log beta       
+
+} # end of conditions
+
+#time weak eta parameter
+tau_eta_tw                = pow(sigma_eta_tw,-2)                     #prior on precision of dist. of eta      
+sigma_eta_tw              ~ dunif(sigmaEtaL,sigmaEtaU)               #prior on std of dist. of etas   
+
+#pt weak lambda parameter
+mu_log_lambda             ~ dunif(muLogLambdaL,muLogLambdaU)         #prior on mean of dist. of log lambda
+tau_log_lambda            = pow(sigma_log_lambda,-2)                 #prior on precision of dist. of log lambda
+sigma_log_lambda          ~ dunif(sigmaLogLambdaL,sigmaLogLambdaU)   #prior on std of dist. of log lambda
+
+#pt weak alphaGain parameter                
+mu_log_alphaGain              ~ dunif(muLogAlphaL,muLogAlphaU)       #prior on mean of dist. of log alphaGain
+tau_log_alphaGain             = pow(sigma_log_alphaGain,-2)          #prior on precision of log alphaGain 
+sigma_log_alphaGain           ~ dunif(sigmaLogAlphaL,sigmaLogAlphaU) #prior on std of dist. of log alphaGain      
+
+#pt weak alphaLoss parameter                
+mu_log_alphaLoss              ~ dunif(muLogAlphaL,muLogAlphaU)       #prior on mean of dist. of log alphaLoss
+tau_log_alphaLoss             = pow(sigma_log_alphaLoss,-2)          #prior on precision of log alphaLoss 
+sigma_log_alphaLoss           ~ dunif(sigmaLogAlphaL,sigmaLogAlphaU) #prior on std of dist. of log alphaLoss      
+
+#iso weak eta parameter                           
+mu_eta_iso                ~ dunif(muEtaL,muEtaU)                     #prior on mean of dist. of eta is uniformly distributed
+tau_eta_iso               = pow(sigma_eta_iso,-2)                    #prior on precision of dist. of log eta
+sigma_eta_iso             ~ dunif(sigmaEtaL,sigmaEtaU)               #prior on std of dist. of eta    
+
+##DATA PROCESSING
+
+#compute absolute values of outcomes
+adx1=abs(dx1)            #outcome 1
+adx2=abs(dx2)            #outcome 2
+adx3=abs(dx3)            #outcome 3   
+adx4=abs(dx4)            #outcome 4
+
+#condition specific etas 
+selectEtaTw[1] = 0       #sets eta to zero (linear utility) for additive session 
+selectEtaTw[2] = 1.00001 #sets eta to ~1 (log utility) for multiplicative session, 1.00001 prevents dividing by 0, but still arbitrarily close to a logarithm
+
+}
