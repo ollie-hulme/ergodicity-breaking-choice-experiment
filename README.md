@@ -58,7 +58,7 @@ This is a repository for all code and data to reproduce an experiment exploring 
  copy of JAGS, allowing many jobs to be run at the same time. matjags1.m
  calls the first version of JAGS in "jagstmp1" and so forth.
  
- "samples&stats" contain the outputs of JAGS, including all relevant
+ "samples_stats" contain the outputs of JAGS, including all relevant
  statistics and samples for further analysis by plotHLM.m
 
  The remaining files in the base directory are the main matlab scripts and JAGS models

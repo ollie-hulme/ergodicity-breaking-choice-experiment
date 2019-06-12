@@ -40,9 +40,9 @@ if exist('whichPlots','var')==0
     whichPlots=input('which plots to generate?');
 end
 if exist('whichDir','var')==0
-    cd('samples&stats');nSamples=1;
+    cd('samples_stats');nSamples=1;
 else
-    cd(['samples&stats/',whichDir]);sampList=dir('JAGS*');nSamples=numel(sampList);
+    cd(['samples_stats/',whichDir]);sampList=dir('JAGS*');nSamples=numel(sampList);
 end
 switch realData
     case 1%real agents

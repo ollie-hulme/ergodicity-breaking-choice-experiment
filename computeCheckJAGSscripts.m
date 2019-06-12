@@ -6,7 +6,7 @@
 
 %% Load jags output 
 clc
-cd 'samples&stats'
+cd 'samples_stats'
 disp('load the jags output')
 uiopen %opens interface to load relevant samples
 
