@@ -18,7 +18,7 @@ The readMe file has been structured loosely according to [IEEE suggestions](http
 
 # Data
 
-Before running the pipeline, you need to download and unzip [this file](https://mfr.osf.io/render?url=https://osf.io/ksm3z/?action=download%26mode=render). 
+Before running the pipeline, you need to download and unzip [this file](https://osf.io/ksm3z/?action=download%26mode=render). 
 
 This will unzip to two folders: `/matjags` and `/samples_stats`. Copy paste the content from each folder into their respective folders.
 
