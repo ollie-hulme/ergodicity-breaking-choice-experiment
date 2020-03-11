@@ -18,9 +18,11 @@ The readMe file has been structured loosely according to [IEEE suggestions](http
 
 # Data
 
+You will download this repository and save it locally. 
+
 Before running the pipeline, you need to download and unzip [this file](https://osf.io/ksm3z/?action=download%26mode=render). 
 
-This will unzip to two folders: `/matjags` and `/samples_stats`. Copy paste the content from each folder into their respective folders.
+This will unzip to two folders: `/matjags` and `/samples&stats`. Copy paste the content from each folder into their respective folders (ie '/matjags' and '/samples_stats') in the repository you just downloaded from github.
 
 # Platform/Environment
 The original raw data files are in .txt format. A python script (Python 2.7) 
