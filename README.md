@@ -68,21 +68,22 @@ JAGS. There are multiple copies of this script, each calling a different
 copy of JAGS, allowing many jobs to be run at the same time. matjags1.m
 calls the first version of JAGS in "jagstmp1" and so forth.
 
-"samples&stats" contain the outputs of JAGS, including all relevant
+"samples_stats" contain the outputs of JAGS, including all relevant
 statistics and samples for further analysis by plotHLM.m
 
 The remaining files in the base directory are the main matlab scripts and JAGS models
 
 
 # Major Component Description of Data Set
+
 The original .txt files contain a trial-wise (rows) list of basic
 variables such as time points of when different events occurred, which
 buttons were pressed at which time and what kind of stimuli were
 presented.
+
 The python script "readingData.py" reads these .txt, computes additional
 variables and saves them in one .mat file containing all data for all
-subjects
-For further details on the data, please refer to "Codebook.m"
+subjects. For further details on the data, please refer to "Codebook.m"
 
 
 # Detailed Setup Instructions - setting up and running JAGS
