@@ -376,7 +376,7 @@ toc % end clock
 
 %% Save stats and samples
 disp('saving samples and stats...')
-save(['samples&stats/' modelName,'_',priorName,'_',dataSource,'_burn_',num2str(nBurnin),'_samps_',num2str(nSamples),'_chains_',num2str(nChains),'_',datestr(clock)],'stats','samples','-v7.3')
+save(['samples_stats/' modelName,'_',priorName,'_',dataSource,'_burn_',num2str(nBurnin),'_samps_',num2str(nSamples),'_chains_',num2str(nChains),'_',datestr(clock)],'stats','samples','-v7.3')
 
 %% Print readouts
 disp('stats:'),disp(stats)%print out structure of stats output
