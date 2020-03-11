@@ -102,7 +102,7 @@ JAGS model, pertaining to the following key variables:
    which quality levels of the model to run in which order - whichQuals
    whether to generate plots - runPlots
 For further details, please refer to one of the different runHLM scripts
-(runHLM1.m - runHLM28.m) in the folder "jobs" and read the commenting
+(e.g.runHLM1.m) in the folder "jobs" and read the commenting
 
 runHLM#
 runHLM#.m (in folder 'jobs') calls setHLM.m (in main folder) which 
