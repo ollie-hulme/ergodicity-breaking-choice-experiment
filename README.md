@@ -20,7 +20,7 @@ The readMe file has been structured loosely according to [IEEE suggestions](http
 
 You will download this repository and save it locally. 
 
-Before running the pipeline, you need to download and unzip [this file](https://osf.io/ksm3z/?action=download%26mode=render). 
+Before running the pipeline, you need to download and unzip [this file](https://mfr.osf.io/render?url=https://osf.io/fhqnz/?direct%26mode=render%26action=download%26mode=render). 
 
 This will unzip to two folders: `/matjags` and `/samples&stats`. Copy paste the content from each folder into their respective folders (ie '/matjags' and '/samples_stats') in the repository you just downloaded from github.
 
